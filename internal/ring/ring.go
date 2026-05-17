@@ -1,19 +1,22 @@
 package ring
 
 import (
+	"fmt"
 	"hash/crc32"
 	"sort"
 )
 
 type Ring struct {
-	nodes  map[uint32]string
-	hashes []uint32
+	nodes        map[uint32]string
+	hashes       []uint32
+	virtualNodes int
 }
 
-func New() *Ring {
+func New(virtualNodes int) *Ring {
 	return &Ring{
-		nodes:  make(map[uint32]string),
-		hashes: make([]uint32, 0),
+		nodes:        make(map[uint32]string),
+		hashes:       make([]uint32, 0),
+		virtualNodes: virtualNodes,
 	}
 }
 
@@ -24,15 +27,15 @@ func hashKey(key string) uint32 {
 // AddNode adds a node to the hashring taking the given address to generate
 // a hash corresponding to the added node.
 func (r *Ring) AddNode(address string) {
-	hash := hashKey(address)
-
-	r.nodes[hash] = address
-	r.hashes = append(r.hashes, hash)
-
-	// Sort assuming the hashes are already sorted
-	for i := len(r.hashes) - 1; i >= 1 && r.hashes[i-1] > r.hashes[i]; i-- {
-		r.hashes[i-1], r.hashes[i] = r.hashes[i], r.hashes[i-1]
+	for i := 0; i < r.virtualNodes; i++ {
+		hash := hashKey(address + fmt.Sprintf("#%d", i))
+		r.nodes[hash] = address
+		r.hashes = append(r.hashes, hash)
 	}
+
+	sort.Slice(r.hashes, func(i, j int) bool {
+		return r.hashes[i] < r.hashes[j]
+	})
 }
 
 // GetNode returns the node address corresponding to the given key by hashing the key

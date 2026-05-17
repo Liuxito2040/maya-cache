@@ -7,7 +7,7 @@ import (
 )
 
 func main() {
-	r := ring.New()
+	r := ring.New(256)
 
 	r.AddNode("http://localhost:8081")
 	r.AddNode("http://localhost:8082")

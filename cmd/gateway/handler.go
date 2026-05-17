@@ -4,6 +4,7 @@ import (
 	"MayaCache/internal/ring"
 	"encoding/json"
 	"io"
+	"log"
 	"net/http"
 )
 
@@ -20,6 +21,7 @@ func NewGatewayHandler(r *ring.Ring) *GatewayHandler {
 func (h *GatewayHandler) Get(w http.ResponseWriter, r *http.Request) {
 	key := r.URL.Query().Get("key")
 	node := h.ring.GetNode(key)
+	log.Printf("key=%s routed_to=%s", key, node)
 
 	resp, err := http.Get(node + "/internal/cache?key=" + key)
 	if err != nil {
