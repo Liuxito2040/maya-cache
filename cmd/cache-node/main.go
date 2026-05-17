@@ -5,12 +5,19 @@ import (
 	"MayaCache/internal/cache"
 	"log"
 	"net/http"
+	"os"
 )
 
 func main() {
-	cache := cache.New()
-	handler := api.NewHandler(cache)
-	http.HandleFunc("/cache", handler.GetCache)
-	log.Println("cache code running on: ")
-	log.Fatal(http.ListenAndServe(":8080", nil))
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8081"
+	}
+
+	c := cache.New()
+	handler := api.NewHandler(c)
+	http.HandleFunc("/internal/cache", handler.GetCache)
+
+	log.Println("cache node running on :" + port)
+	log.Fatal(http.ListenAndServe(":"+port, nil))
 }

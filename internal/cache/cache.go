@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// Cache is a simple in-memory cache that stores key-value pairs with an expiration time.
 type Cache struct {
 	mu    sync.RWMutex
 	items map[string]Item
@@ -26,6 +27,8 @@ func (c *Cache) Set(key string, value []byte, ttl time.Duration) {
 	}
 }
 
+// Get retrieves the value associated with the given key. 
+// If the key does not exist or has expired, it returns nil.
 func (c *Cache) Get(key string) []byte {
 	c.mu.RLock()
 	item, exists := c.items[key]
