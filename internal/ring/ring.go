@@ -2,7 +2,7 @@ package ring
 
 import (
 	"fmt"
-	"hash/crc32"
+	"hash/fnv"
 	"sort"
 )
 
@@ -21,7 +21,9 @@ func New(virtualNodes int) *Ring {
 }
 
 func hashKey(key string) uint32 {
-	return crc32.ChecksumIEEE([]byte(key))
+	h := fnv.New32a()
+	h.Write([]byte(key))
+	return h.Sum32()
 }
 
 // AddNode adds a node to the hashring taking the given address to generate
